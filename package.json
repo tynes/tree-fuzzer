@@ -1,0 +1,21 @@
+{
+  "name": "tree-fuzzer",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "bcfg": "^0.1.6",
+    "bcurl": "^0.1.6",
+    "blgr": "^0.1.7",
+    "hsd": "https://github.com/tynes/hsd.git#wallet-name-alerts"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
