@@ -3,6 +3,7 @@
 'use strict';
 
 const Config = require('bcfg');
+const Logger = require('blgr');
 const app = require('../lib/app');
 
 const ports = {
@@ -14,7 +15,7 @@ const ports = {
 
 class CLI {
   constructor() {
-    this.config = new Config('hfuzz', {
+    this.config = new Config('tree-fuzzer', {
       alias: {
         'n': 'network',
       }
@@ -25,20 +26,24 @@ class CLI {
       env: true
     });
 
-    this.config.open('hfuzz.conf');
+    this.config.open('tree-fuzzer.conf');
 
-    this.network = this.config.str('network', 'main');
+    this.logger = new Logger();
+    this.logger.set({
+      filename: this.config.bool('log-file')
+        ? this.config.location('logs')
+        : null,
+      level: this.config.str('log-level', 'info'),
+      console: this.config.bool('log-console', true)
+    });
+
+    this.config.set('logger', this.logger);
 
     this.app = app;
   }
 
-  log(json) {
-    if (typeof json === 'string')
-      return console.log.apply(console, arguments);
-    return console.log(JSON.stringify(json, null, 2));
-  }
-
   async open() {
+    await this.logger.open();
     await this.app(this.config);
   }
 
