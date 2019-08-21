@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const Config = require('bcfg');
+const Logger = require('blgr');
+const app = require('../lib/app');
+
+const ports = {
+  main: 12037,
+  testnet: 13037,
+  regtest: 14037,
+  simnet: 15037
+};
+
+class CLI {
+  constructor() {
+    this.config = new Config('tree-fuzzer', {
+      alias: {
+        'n': 'network',
+      }
+    });
+
+    this.config.load({
+      argv: true,
+      env: true
+    });
+
+    this.config.open('tree-fuzzer.conf');
+
+    this.logger = new Logger();
+    this.logger.set({
+      filename: this.config.bool('log-file')
+        ? this.config.location('logs')
+        : null,
+      level: this.config.str('log-level', 'info'),
+      console: this.config.bool('log-console', true)
+    });
+
+    this.config.set('logger', this.logger);
+
+    this.app = app;
+  }
+
+  async open() {
+    await this.logger.open();
+    await this.app(this.config);
+  }
+
+  async destroy() {
+    ;
+  }
+}
+
+(async () => {
+  const cli = new CLI();
+  try {
+    await cli.open();
+  } catch (e) {
+    debugger;
+    console.log(e)
+  }
+  await cli.destroy();
+})().catch((err) => {
+  console.error(err.stack);
+  process.exit(1);
+});
